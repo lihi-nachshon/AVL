@@ -15,15 +15,15 @@ class AVLNode(object):
 	@param value: data of your node
 	"""
 
-	def __init__(self, value, isReal = True, height = 0, size = 1, parent = None):
+	def __init__(self, value, isReal = True, height = 0, size = 1, parent = None, left = None):
 		self.value = value
 		if(isReal):
 			self.left = AVLNode(None, False, -1, 0, self)
 			self.right = AVLNode(None, False, -1, 0, self)
-			self.parent = AVLNode(None, False, -1, 0)
+			self.parent = AVLNode(None, False, -1, 0, None ,self)
 		else:
 			self.left = None
-			self.right = None
+			self.right = left
 			self.parent = parent
 		self.height = height # Balance factor
 		self.size = size
@@ -169,7 +169,7 @@ class AVLTreeList(object):
 	@returns: the the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		if 0 <= i <= self.size:
+		if 0 <= i < self.size:
 			return self.Tree_select(i + 1).getValue()
 		return None
 
@@ -226,6 +226,8 @@ class AVLTreeList(object):
 		self.lastItem = node
 		self.size = 1
 		return 0
+
+
 	"""deletes the i'th item in the list
 
 	@type i: int
@@ -241,6 +243,13 @@ class AVLTreeList(object):
 			return -1
 
 		node = self.Tree_select(i + 1)
+
+		if n == 1:
+			self.root = None
+			self.lastItem = None
+			self.firstItem = None
+			self.size -= 1
+			return 0
 
 		if i == 0:
 			self.firstItem = self.successor(node)
@@ -261,22 +270,16 @@ class AVLTreeList(object):
 			return self.delete_node_with_two_children(node, i)
 
 	def delete_leaf(self, node):
-		isRoot = (node == self.root)
 		node_parent = node.getParent()
 		if node_parent.getLeft() == node:
 			node_parent.setLeft(AVLNode(None, False, -1, 0, node_parent))
 		else:
 			node_parent.setRight(AVLNode(None, False, -1, 0, node_parent))
-		node.setParent(None)
-		if isRoot:
-			self.root = None
-			self.lastItem = None
-			self.firstItem = None
-			self.size -= 1
-			return 0
+		node.setParent(AVLNode(None, False, -1, 0, None, node))
 		self.size -= 1
 		self.update_fields_till_root(node_parent)
 		cnt_rotations = self.delete_fix_tree(node_parent)
+		self.update_root(self.firstItem)
 
 		return cnt_rotations
 
@@ -289,15 +292,15 @@ class AVLTreeList(object):
 			node_parent.setLeft(child)
 		else:
 			node_parent.setRight(child)
-		node.setParent(None)
-		node.setRight(None)
+		node.setParent(AVLNode(None, False, -1, 0, None, node))
+		node.setRight(AVLNode(None, False, -1, 0, node))
 		if isRoot:
 			self.root = child
 			self.lastItem = child
 			self.firstItem = child
 			self.size -= 1
 			self.update_fields(child)
-			self.root.setParent(AVLNode(None, False, -1, 0))
+			self.root.setParent(AVLNode(None, False, -1, 0, None, self.root))
 			return 0
 		self.size -= 1
 		self.update_fields_till_root(node_parent)
@@ -314,15 +317,15 @@ class AVLTreeList(object):
 			node_parent.setLeft(child)
 		else:
 			node_parent.setRight(child)
-		node.setParent(None)
-		node.setLeft(None)
+		node.setParent(AVLNode(None, False, -1, 0, None, node))
+		node.setLeft(AVLNode(None, False, -1, 0, node))
 		if isRoot:
 			self.root = child
 			self.lastItem = child
 			self.firstItem = child
 			self.size -= 1
 			self.update_fields(child)
-			self.root.setParent(AVLNode(None, False, -1, 0))
+			self.root.setParent(AVLNode(None, False, -1, 0, None, self.root))
 			return 0
 		self.size -= 1
 		self.update_fields_till_root(node_parent)
@@ -357,6 +360,7 @@ class AVLTreeList(object):
 		while(node.getParent().isRealNode()):
 			node = node.getParent()
 		self.root = node
+		node.setParent(AVLNode(None, False, -1, 0, None, node))
 
 	"""returns the value of the first item in the list
 
@@ -428,17 +432,21 @@ class AVLTreeList(object):
 		if self.size == 0:
 			if lst.size == 0:
 				return 0
-			self = lst
-			return lst.root.height
+			self.size = lst.size
+			self.root = lst.root
+			self.firstItem = lst.firstItem
+			self.lastItem = lst.lastItem
+			return lst.root.height + 1
 		if lst.size == 0:
-			return self.root.height
+			return self.root.height + 1  #empty tree height is -1
+		height_difference = abs(self.root.height - lst.root.height)
 		if self.root.height > lst.root.height:
 			self.right_concat(lst)
 		elif self.root.height < lst.root.height:
 			self.left_concat(lst)
 		else:
 			self.same_height_concat(lst)
-		return abs(self.root.height - lst.root.height)
+		return height_difference
 
 	"""searches for a *value* in the list
 
@@ -449,7 +457,10 @@ class AVLTreeList(object):
 	"""
 	def search(self, val):
 		arr = self.listToArray()
-		return arr.index(val)
+		if val in arr:
+			return arr.index(val)
+		else:
+			return -1
 
 
 
@@ -539,6 +550,8 @@ class AVLTreeList(object):
 
 		self.update_fields(node)
 		self.update_fields(r_node)
+		if node_parent.isRealNode():
+			self.update_fields(node_parent)
 
 	def LR_rotation(self, node):
 		l_node = node.getLeft()
@@ -563,6 +576,8 @@ class AVLTreeList(object):
 
 		self.update_fields(node)
 		self.update_fields(l_node)
+		if node_parent.isRealNode():
+			self.update_fields(node_parent)
 
 	def RL_rotation(self, node):
 		r_node = node.getRight()
@@ -575,14 +590,19 @@ class AVLTreeList(object):
 			BF_r = self.get_BF(node.getRight())
 			if BF_r == -1 or BF_r == 0:
 				self.L_rotation(node)
+				return 1
 			if BF_r == 1:
 				self.RL_rotation(node)
+				return 2
 		if BF == 2:
 			BF_l = self.get_BF(node.getLeft())
 			if BF_l == -1:
 				self.LR_rotation(node)
+				return 2
 			if BF_l == 1 or BF_l == 0:
 				self.R_rotation(node)
+				return 1
+		return 0
 
 	# return the number of rotations
 	def insert_fix_tree(self, node):
@@ -593,13 +613,14 @@ class AVLTreeList(object):
 			self.update_fields(y)
 			BF = self.get_BF(y)
 			if abs(BF) < 2 and prev_height == y.getHeight():
-				break
+				y = y.getParent()
+				continue
 			elif abs(BF) < 2 and prev_height != y.getHeight():
 				y = y.getParent()
 				continue
 			else:
-				self.check_and_rotate(y)
-				cnt_rotations += 1
+				num_rot = self.check_and_rotate(y)
+				cnt_rotations += num_rot
 				break
 
 		return cnt_rotations
@@ -618,13 +639,14 @@ class AVLTreeList(object):
 			self.update_fields(y)
 			BF = self.get_BF(y)
 			if abs(BF) < 2 and prev_height == y.getHeight():
-				break
+				y = y.getParent()
+				continue
 			elif abs(BF) < 2 and prev_height != y.getHeight():
 				y = y.getParent()
 				continue
 			else:
-				self.check_and_rotate(y)
-				cnt_rotations += 1
+				num_rot = self.check_and_rotate(y)
+				cnt_rotations += num_rot
 				y = y.getParent()
 
 		return cnt_rotations
@@ -804,9 +826,6 @@ class AVLTreeList(object):
 
 
 
-	def check_family(self, node, tree):
-		self.assertEqual(node, node.getLeft().getParent())
-		self.assertEqual(node, node.getRight().getParent())
 
 
 
@@ -827,23 +846,12 @@ class AVLTreeList(object):
 # 	print(T5.getRoot() == T5.getRoot().getLeft().getParent())
 # 	print(T5.getRoot() == T5.getRoot().getRight().getParent())
 
-T1 = AVLTreeList()
-T2 = AVLTreeList()
-for i in range(3):
-	T1.append(i)
-for i in range(1):
-	T2.append(i)
-T1.printt()
-T2.printt()
-T1.concat(T2)
-T1.printt()
-T3 = AVLTreeList()
-T4 = AVLTreeList()
-for i in range(3):
-	T4.append(i)
-for i in range(1):
-	T3.append(i)
-T3.printt()
-T4.printt()
-T3.concat(T4)
-T3.printt()
+
+
+T = AVLTreeList()
+x = T.append(3)
+print(x)
+y = T.insert(0, 1)
+z = T.insert(1, 2)
+
+print( "0,1,3 " , x,y,z)
