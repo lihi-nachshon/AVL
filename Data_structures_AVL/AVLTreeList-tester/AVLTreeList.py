@@ -847,11 +847,19 @@ class AVLTreeList(object):
 # 	print(T5.getRoot() == T5.getRoot().getRight().getParent())
 
 
-
 T = AVLTreeList()
-x = T.append(3)
-print(x)
-y = T.insert(0, 1)
-z = T.insert(1, 2)
+L = []
 
-print( "0,1,3 " , x,y,z)
+for i in range(20):
+	if i % 3 == 0:
+		T.insert(T.length() // 2, i)
+		L.insert(len(L) // 2, i)
+	elif i % 3 == 1:
+		T.insert(0, i)
+		L.insert(0, i)
+	else:
+		T.delete(T.length() // 2)
+		L.pop(len(L) // 2)
+T.printt()
+print(L)
+
