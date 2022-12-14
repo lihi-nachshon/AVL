@@ -334,8 +334,13 @@ class AVLTreeList(object):
 		return cnt_rotations
 
 	def delete_node_with_two_children(self, node, index):
+		suc_last = False
 		node_successor = self.successor(node)
+		if node_successor == self.lastItem:
+			suc_last = True
 		cnt_rotations = self.delete(index + 1)
+		if suc_last == True:
+			self.lastItem = node_successor
 		node_lchild = node.getLeft()
 		node_rchild = node.getRight()
 		node_parent = node.getParent()
@@ -848,18 +853,8 @@ class AVLTreeList(object):
 
 
 T = AVLTreeList()
-L = []
+T.in_order(self.twentyTree, self.twentyTree.getRoot(),
+				  self.check_family)
 
-for i in range(20):
-	if i % 3 == 0:
-		T.insert(T.length() // 2, i)
-		L.insert(len(L) // 2, i)
-	elif i % 3 == 1:
-		T.insert(0, i)
-		L.insert(0, i)
-	else:
-		T.delete(T.length() // 2)
-		L.pop(len(L) // 2)
-T.printt()
-print(L)
+	self.assertIsNone(self.twentyTree.getRoot().getParent())
 
