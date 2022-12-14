@@ -20,7 +20,7 @@ class AVLNode(object):
 		if(isReal):
 			self.left = AVLNode(None, False, -1, 0, self)
 			self.right = AVLNode(None, False, -1, 0, self)
-			self.parent = AVLNode(None, False, -1, 0, None ,self)
+			self.parent = AVLNode(None, False, -1, 0, None,self)
 		else:
 			self.left = None
 			self.right = left
@@ -413,8 +413,32 @@ class AVLTreeList(object):
 	"""
 	def sort(self):
 		arr = self.listToArray()
-		arr.sort()
+		self.mergesort(arr)
 		return self.create_tree_from_sorted_array(arr)
+
+	def mergesort(self, lst):
+		n = len(lst)
+		if n <= 1:
+			return lst
+		else:
+			return self.merge(self.mergesort(lst[0:n//2]),self.mergesort(lst[n//2:]))
+
+	def merge(self,A, B):
+		n = len(A)
+		m = len(B)
+		C = [0 for i in range(n + m)]
+		a, b, c = 0
+		while a < n and b < m:
+			if A[a] < B[b]:
+				C[c] = A[a]
+				a += 1
+			else:
+				C[c] = B[b]
+				b += 1
+			c += 1
+		C[c:] = A[a:] + B[b:]
+
+		return C
 
 	"""permute the info values of the list 
 
@@ -717,6 +741,7 @@ class AVLTreeList(object):
 		self.join(l_node, x, r_node, "right")
 		self.size += lst.size + 1
 		self.firstItem = lst.firstItem
+		self.lastItem = lst.lastItem
 		self.delete(x_index)
 
 	def same_height_concat(self, lst):
@@ -730,7 +755,7 @@ class AVLTreeList(object):
 		b.setParent(x)
 		self.root = x
 		self.lastItem = lst.lastItem
-		self.size += lst.size
+		self.size += lst.size + 1
 		self.update_fields(x)
 		self.delete(x_index)
 
@@ -828,33 +853,19 @@ class AVLTreeList(object):
 		self.insert(self.length(), val)
 
 
-
-
-
-
-
-
-# T5 = AVLTreeList()
-#
-# for i in range(200):
-# 	if i % 5 == 0:
-# 		T5.insert(0, i)
-# 	elif i % 5 == 1:
-# 		T5.insert(T5.length(), i)
-# 	elif i % 5 == 2:
-# 		T5.insert(i // 2, i)
-# 	elif i % 5 == 3:
-# 		T5.insert(i // 3, i)
-# 	else:
-# 		T5.insert(i // 7, i)
-# 	T5.printt()
-# 	print(T5.getRoot() == T5.getRoot().getLeft().getParent())
-# 	print(T5.getRoot() == T5.getRoot().getRight().getParent())
-
-
-T = AVLTreeList()
-T.in_order(self.twentyTree, self.twentyTree.getRoot(),
-				  self.check_family)
-
-	self.assertIsNone(self.twentyTree.getRoot().getParent())
-
+T1 = AVLTreeList()
+T2 = AVLTreeList()
+L1 = list()
+L2 = list()
+for i in range(10):
+	T1.append(i)
+	L1.append(i)
+for i in range(5):
+	T2.append(i)
+	L2.append(i)
+T1.concat(T2)
+L3 = L1 + L2
+T1.printt()
+print(L3)
+print(T1.last())
+print(L3[-1])
