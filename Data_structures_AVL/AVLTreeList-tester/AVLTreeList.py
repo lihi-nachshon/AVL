@@ -447,7 +447,11 @@ class AVLTreeList(object):
 	"""
 	def permutation(self):
 		arr = self.listToArray()
-		random.shuffle(arr)
+		for i in range(len(arr) - 1, 0, -1):
+			j = random.randint(0, i)
+			temp = arr[j]
+			arr[j] = arr[i]
+			arr[i] = temp
 		return self.create_tree_from_sorted_array(arr)
 
 	"""concatenates lst to self
@@ -579,8 +583,7 @@ class AVLTreeList(object):
 
 		self.update_fields(node)
 		self.update_fields(r_node)
-		if node_parent.isRealNode():
-			self.update_fields(node_parent)
+
 
 	def LR_rotation(self, node):
 		l_node = node.getLeft()
@@ -605,8 +608,7 @@ class AVLTreeList(object):
 
 		self.update_fields(node)
 		self.update_fields(l_node)
-		if node_parent.isRealNode():
-			self.update_fields(node_parent)
+
 
 	def RL_rotation(self, node):
 		r_node = node.getRight()
@@ -642,8 +644,7 @@ class AVLTreeList(object):
 			self.update_fields(y)
 			BF = self.get_BF(y)
 			if abs(BF) < 2 and prev_height == y.getHeight():
-				y = y.getParent()
-				continue
+				break
 			elif abs(BF) < 2 and prev_height != y.getHeight():
 				y = y.getParent()
 				continue
@@ -853,19 +854,16 @@ class AVLTreeList(object):
 		self.insert(self.length(), val)
 
 
-T1 = AVLTreeList()
-T2 = AVLTreeList()
-L1 = list()
-L2 = list()
-for i in range(10):
-	T1.append(i)
-	L1.append(i)
-for i in range(5):
-	T2.append(i)
-	L2.append(i)
-T1.concat(T2)
-L3 = L1 + L2
-T1.printt()
-print(L3)
-print(T1.last())
-print(L3[-1])
+T = AVLTreeList()
+
+for i in range(500):
+	if i % 3 == 0:
+		T.insert(T.length() // 2, i)
+	elif i % 3 == 1:
+		T.insert(0, i)
+	else:
+		T.delete(T.length() // 2)
+	if i==28:
+		print("here")
+	print(i)
+	T.printt()
