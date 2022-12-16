@@ -81,6 +81,7 @@ class AVLNode(object):
 	"""
     """Time complexity: O(1)"""
     def setLeft(self, node):
+        node.setParent(self)
         self.left = node
 
     """sets right child
@@ -89,6 +90,7 @@ class AVLNode(object):
 	"""
     """Time complexity: O(1)"""
     def setRight(self, node):
+        node.setParent(self)
         self.right = node
 
     """sets parent
@@ -190,13 +192,11 @@ class AVLTreeList(object):
         if i == 0:
             node_first = self.firstItem
             node_first.setLeft(new_node)
-            new_node.setParent(node_first)
             self.firstItem = new_node
         # if insert last
         elif i == n:
             node_last = self.lastItem
             node_last.setRight(new_node)
-            new_node.setParent(node_last)
             self.lastItem = new_node
         else:
             # finds the current node in position and inserts before it
@@ -204,11 +204,9 @@ class AVLTreeList(object):
             # if the current node in position has no left child
             if not node_successor.getLeft().isRealNode():
                 node_successor.setLeft(new_node)
-                new_node.setParent(node_successor)
             else:
                 node_predecessor = self.predecessor(node_successor)
                 node_predecessor.setRight(new_node)
-                new_node.setParent(node_predecessor)
 
         self.size += 1
         self.update_size_till_root(new_node)
@@ -300,7 +298,6 @@ class AVLTreeList(object):
             self.root.setParent(None)
             return 0
         node_parent = node.getParent()
-        child.setParent(node_parent)
         if node_parent.getLeft() == node:
             node_parent.setLeft(child)
         else:
@@ -329,7 +326,6 @@ class AVLTreeList(object):
             self.root.setParent(None)
             return 0
         node_parent = node.getParent()
-        child.setParent(node_parent)
         if node_parent.getLeft() == node:
             node_parent.setLeft(child)
         else:
@@ -372,10 +368,7 @@ class AVLTreeList(object):
                 node_parent.setLeft(node_successor)
             else:
                 node_parent.setRight(node_successor)
-            node_successor.setParent(node_parent)
 
-        node_lchild.setParent(node_successor)
-        node_rchild.setParent(node_successor)
         node_successor.setRight(node_rchild)
         node_successor.setLeft(node_lchild)
         self.update_fields(node_successor)
@@ -397,7 +390,6 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
     """Time complexity: O(1)"""
-
     def last(self):
         if self.lastItem is None:
             return None
@@ -408,7 +400,6 @@ class AVLTreeList(object):
 	@returns: a list of strings representing the data structure
 	"""
     """Time complexity: O(n)"""
-
     def listToArray(self):
         list = []
         if self.size > 0:
@@ -417,7 +408,6 @@ class AVLTreeList(object):
 
     """adds the values to a list via in order walk
 		Time complexity: O(n)"""
-
     def in_order(self, list):
         self.in_order_rec(list, self.root)
 
@@ -432,7 +422,6 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
     """Time complexity: O(1)"""
-
     def length(self):
         return self.size
 
@@ -441,7 +430,6 @@ class AVLTreeList(object):
 	@returns: an AVLTreeList where the values are sorted by the info of the original list.
 	"""
     """Time complexity: O(nlogn), using mergesort"""
-
     def sort(self):
         arr = self.listToArray()
         self.mergesort(arr)
@@ -519,8 +507,6 @@ class AVLTreeList(object):
         r_child = self.create_tree_from_array_rec(right)
         node_parent.setRight(r_child)
         node_parent.setLeft(l_child)
-        l_child.setParent(node_parent)
-        r_child.setParent(node_parent)
         self.update_fields(node_parent)
 
         return node_parent
@@ -592,14 +578,12 @@ class AVLTreeList(object):
 		Time complexity: O(logn)"""
     def same_height_concat(self, lst):
         # adds node x for the join function
-        x = AVLNode(0)
+        x = AVLNode(None)
         x_index = self.size
         a = self.root
         b = lst.root
         x.setLeft(a)
         x.setRight(b)
-        a.setParent(x)
-        b.setParent(x)
         self.root = x
         self.lastItem = lst.lastItem
         self.size += lst.size + 1
@@ -611,15 +595,12 @@ class AVLTreeList(object):
         joins self, x, lst when self < x < lst (by indexes in the new list)
 		Time complexity: O(logn)"""
     def join(self, a, x, b, dir):
-        x.setLeft(a)
-        x.setRight(b)
         if dir == "left":
             c = b.getParent()
         else:
             c = a.getParent()
-        a.setParent(x)
-        b.setParent(x)
-        x.setParent(c)
+        x.setLeft(a)
+        x.setRight(b)
         if dir == "left":
             c.setLeft(x)
         else:
@@ -742,10 +723,8 @@ class AVLTreeList(object):
                 node_parent.setLeft(r_node)
             else:
                 node_parent.setRight(r_node)
-            r_node.setParent(node_parent)
-        node.setParent(r_node)
+
         node.setRight(rl_node)
-        rl_node.setParent(node)
         r_node.setLeft(node)
 
         self.update_fields(node)
@@ -773,10 +752,8 @@ class AVLTreeList(object):
                 node_parent.setLeft(l_node)
             else:
                 node_parent.setRight(l_node)
-            l_node.setParent(node_parent)
-        node.setParent(l_node)
+
         node.setLeft(lr_node)
-        lr_node.setParent(node)
         l_node.setRight(node)
 
         self.update_fields(node)
@@ -827,7 +804,6 @@ class AVLTreeList(object):
                 break
             elif abs(BF) < 2 and prev_height != y.getHeight():
                 y = y.getParent()
-                continue
             else:
                 num_rot = self.check_and_rotate(y)
                 cnt_rotations += num_rot
@@ -855,12 +831,9 @@ class AVLTreeList(object):
             self.update_fields(y)
             BF = self.get_BF(y)
             if abs(BF) < 2 and prev_height == y.getHeight():
-                break
-                #y = y.getParent()
-                #continue
+                y = y.getParent()
             elif abs(BF) < 2 and prev_height != y.getHeight():
                 y = y.getParent()
-                continue
             else:
                 num_rot = self.check_and_rotate(y)
                 cnt_rotations += num_rot
@@ -938,3 +911,16 @@ class AVLTreeList(object):
 
     def append(self, val):
         self.insert(self.length(), val)
+
+
+
+
+T1 = AVLTreeList()
+T2 = AVLTreeList()
+for i in range(3):
+    T1.append(i)
+for i in range(1):
+    T2.append(i)
+T1.printt()
+T2.printt()
+T1.concat(T2)
