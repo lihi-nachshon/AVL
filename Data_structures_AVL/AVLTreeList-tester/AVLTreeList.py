@@ -7,7 +7,6 @@ import random
 
 """A class represnting a node in an AVL tree"""
 
-
 class AVLNode(object):
     """Constructor, you are allowed to add more fields.
 	@type value: str
@@ -15,16 +14,11 @@ class AVLNode(object):
 	@param value: data of your node
 	"""
 
-    def __init__(self, value, isReal = True):
-        if isReal:
-            self.setLeft(AVLNode(None, False))
-            self.setRight(AVLNode(None, False))
-        # if is a virtual node
-        else:
-            self.left = None
-            self.right = None
-        self.height = 0 if isReal else -1
-        self.size = 1 if isReal else 0
+    def __init__(self, value):
+        self.setLeft(VirtualNode())
+        self.setRight(VirtualNode())
+        self.height = 0
+        self.size = 1
         self.parent = None
         self.value = value
 
@@ -132,10 +126,88 @@ class AVLNode(object):
 	"""
     """Time complexity: O(1)"""
     def isRealNode(self):
-        if self.height == -1:
-            return False
         return True
 
+class VirtualNode(object):
+    def __init__(self):
+        self.left = None
+        self.right = None
+        self.parent = None
+        self.height = -1
+        self.size = 0
+        self.value = None
+
+    """returns the left child
+     @rtype: AVLNode
+     @returns: the left child of self, None if there is no left child"""
+    """Time complexity: O(1)"""
+
+    def getLeft(self):
+        return self.left
+
+    """returns the right child
+    @rtype: AVLNode
+    @returns: the right child of self, None if there is no right child
+    """
+    """Time complexity: O(1)"""
+
+    def getRight(self):
+        return self.right
+
+    """returns the parent 
+    @rtype: AVLNode
+    @returns: the parent of self, None if there is no parent
+    """
+    """Time complexity: O(1)"""
+
+    def getParent(self):
+        return self.parent
+
+    """return the value
+    @rtype: str
+    @returns: the value of self, None if the node is virtual
+    """
+    """Time complexity: O(1)"""
+
+    def getValue(self):
+        return self.value
+
+    """returns the height
+    @rtype: int
+    @returns: the height of self, -1 if the node is virtual
+    """
+    """Time complexity: O(1)"""
+
+    def getHeight(self):
+        return self.height
+
+    """returns the size
+    @rtype int
+    @returns: the size of self, 0 if node is virtual
+    """
+    """Time complexity: O(1)"""
+
+    def getSize(self):
+        return self.size
+
+    """sets parent
+    @type node: AVLNode
+    @param node: a node
+    """
+    """Time complexity: O(1)"""
+
+    def setParent(self, node):
+        self.parent = node
+
+
+    """returns whether self is not a virtual node 
+    @rtype: bool
+    @returns: False if self is a virtual node, True otherwise.
+    """
+    """Time complexity: O(1)"""
+
+    def isRealNode(self):
+        return False
 
 """
 A class implementing the ADT list, using an AVL tree.
@@ -288,9 +360,9 @@ class AVLTreeList(object):
     def delete_leaf(self, node):
         node_parent = node.getParent()
         if node_parent.getLeft() == node:
-            node_parent.setLeft(AVLNode(None, False))
+            node_parent.setLeft(VirtualNode())
         else:
-            node_parent.setRight(AVLNode(None, False))
+            node_parent.setRight(VirtualNode())
         node.setParent(None)
         self.size -= 1
         cnt_rotations = self.rebalance_tree(node_parent)
@@ -322,7 +394,7 @@ class AVLTreeList(object):
         else:
             node_parent.setRight(child)
         node.setParent(None)
-        node.setRight(AVLNode(None, False))
+        node.setRight(VirtualNode())
 
         self.size -= 1
         cnt_rotations = self.rebalance_tree(node_parent)
@@ -354,7 +426,7 @@ class AVLTreeList(object):
         else:
             node_parent.setRight(child)
         node.setParent(None)
-        node.setLeft(AVLNode(None, False))
+        node.setLeft(VirtualNode())
 
         self.size -= 1
         cnt_rotations = self.rebalance_tree(node_parent)
@@ -554,9 +626,9 @@ class AVLTreeList(object):
 		Time complexity: O(n)"""
     def create_tree_from_array_rec(self, arr, i, j):
         if i > j:
-            return AVLNode(None, False)
+            return VirtualNode()
         if i == j:
-            return AVLNode(arr[i], True)
+            return AVLNode(arr[i])
         mid = (j+i)//2
         node_parent = AVLNode(arr[mid])
         l_child = self.create_tree_from_array_rec(arr, i, mid-1)
@@ -582,9 +654,9 @@ class AVLTreeList(object):
             self.root = lst.root
             self.firstItem = lst.firstItem
             self.lastItem = lst.lastItem
-            return lst.root.height
+            return lst.root.height + 1
         if lst.size == 0:
-            return self.root.height
+            return self.root.height + 1
         height_difference = abs(self.root.height - lst.root.height)
         if self.root.height > lst.root.height:
             self.right_concat(lst)
@@ -1209,24 +1281,24 @@ import timeit
 #     print(str(time/n))
 
 
-for i in range(1,11):
-    T = AVLTreeList()
-    n = 1500*(2**i)
-    sum_insert = 0
-    sum_insert_delete = 0
-    for j in range(n//2):
-        index = random.randint(0, T.size)
-        sum_insert += T.insert(index,index)
-
-
-
-    for k in range(n//4):
-        index = random.randint(0, T.size)
-        sum_insert_delete += T.insert(index, index)
-        index = random.randint(0, T.size)
-        sum_insert_delete += T.delete(index)
-
-    print(sum_insert_delete)
+# for i in range(1,11):
+#     T = AVLTreeList()
+#     n = 1500*(2**i)
+#     sum_insert = 0
+#     sum_insert_delete = 0
+#     for j in range(n//2):
+#         index = random.randint(0, T.size)
+#         sum_insert += T.insert(index,index)
+#
+#
+#
+#     for k in range(n//4):
+#         index = random.randint(0, T.size)
+#         sum_insert_delete += T.insert(index, index)
+#         index = random.randint(0, T.size)
+#         sum_insert_delete += T.delete(index)
+#
+#     print(sum_insert_delete)
 
 
 
