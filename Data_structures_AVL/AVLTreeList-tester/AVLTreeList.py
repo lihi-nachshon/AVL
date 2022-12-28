@@ -582,9 +582,9 @@ class AVLTreeList(object):
             self.root = lst.root
             self.firstItem = lst.firstItem
             self.lastItem = lst.lastItem
-            return lst.root.height + 1  # empty tree height is -1
+            return lst.root.height
         if lst.size == 0:
-            return self.root.height + 1  # empty tree height is -1
+            return self.root.height
         height_difference = abs(self.root.height - lst.root.height)
         if self.root.height > lst.root.height:
             self.right_concat(lst)
@@ -1108,105 +1108,125 @@ class Linked_list:
 
 import timeit
 #Q2
-print("insert-first")
-print("AVLTree")
-for i in range(1,11):
-    n = 1500*i
-    T = AVLTreeList()
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(0, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("linkedlist")
-for i in range(1,11):
-    n = 1500*i
-    T = Linked_list()
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(0, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("array")
-for i in range(1,11):
-    n = 1500*i
-    T = []
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(0, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
+# print("insert-first")
+# print("AVLTree")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = AVLTreeList()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(0, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("linkedlist")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = Linked_list()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(0, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("array")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = []
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(0, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+#
+# print("insert randomly")
+#
+# print("AVLTree")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = AVLTreeList()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         index = random.randint(0, T.size)
+#         T.insert(index, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("linkedlist")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = Linked_list()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         index = random.randint(0, T.len)
+#         T.insert(index, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("array")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = []
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         index = random.randint(0, len(T))
+#         T.insert(index, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+#
+# print("insert-last")
+# print("AVLTree")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = AVLTreeList()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(T.size, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("linkedlist")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = Linked_list()
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(T.len, j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
+# print("array")
+# for i in range(1,11):
+#     n = 1500*i
+#     T = []
+#     start = timeit.default_timer()
+#     for j in range(n):
+#         T.insert(len(T), j)
+#     stop = timeit.default_timer()
+#     time = stop - start
+#     print(str(time/n))
 
-print("insert randomly")
 
-print("AVLTree")
 for i in range(1,11):
-    n = 1500*i
     T = AVLTreeList()
-    start = timeit.default_timer()
-    for j in range(n):
+    n = 1500*(2**i)
+    sum_insert = 0
+    sum_insert_delete = 0
+    for j in range(n//2):
         index = random.randint(0, T.size)
-        T.insert(index, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("linkedlist")
-for i in range(1,11):
-    n = 1500*i
-    T = Linked_list()
-    start = timeit.default_timer()
-    for j in range(n):
-        index = random.randint(0, T.len)
-        T.insert(index, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("array")
-for i in range(1,11):
-    n = 1500*i
-    T = []
-    start = timeit.default_timer()
-    for j in range(n):
-        index = random.randint(0, len(T))
-        T.insert(index, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
+        sum_insert += T.insert(index,index)
 
-print("insert-last")
-print("AVLTree")
-for i in range(1,11):
-    n = 1500*i
-    T = AVLTreeList()
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(T.size, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("linkedlist")
-for i in range(1,11):
-    n = 1500*i
-    T = Linked_list()
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(T.len, j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
-print("array")
-for i in range(1,11):
-    n = 1500*i
-    T = []
-    start = timeit.default_timer()
-    for j in range(n):
-        T.insert(len(T), j)
-    stop = timeit.default_timer()
-    time = stop - start
-    print(str(time/n))
+
+
+    for k in range(n//4):
+        index = random.randint(0, T.size)
+        sum_insert_delete += T.insert(index, index)
+        index = random.randint(0, T.size)
+        sum_insert_delete += T.delete(index)
+
+    print(sum_insert_delete)
 
 
 
